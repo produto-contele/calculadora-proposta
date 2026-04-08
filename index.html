@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contele Teams - Portal Comercial & Gerador de Proposta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Cores do Portal Comercial */
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-light: #E2E8F0;
+            --accent-blue: #EFF6FF;
+            --accent-border: #BFDBFE;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.03);
+            --shadow-lg: 0 10px 25px rgba(37, 99, 235, 0.1);
+            --success: #10B981;
+            --success-bg: #D1FAE5;
+
+            /* Cores específicas do PDF (Gerador de Proposta) */
+            --pdf-primary: #0A1461;
+            --pdf-blue: #4F46E5;
+            --pdf-green: #00B050;
+            --pdf-text: #333333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
+
+        /* ==========================================
+           MENU DE NAVEGAÇÃO E TABS
+        ========================================== */
+        nav {
+            background-color: var(--bg-card); padding: 15px 40px; box-shadow: var(--shadow-sm);
+            display: flex; justify-content: space-between; align-items: center; position: sticky;
+            top: 0; z-index: 1000; border-bottom: 1px solid var(--border-light);
+        }
+        nav img { height: 35px; }
+        .nav-links { display: flex; gap: 10px; }
+        .nav-links button {
+            background: none; border: none; font-size: 14px; font-weight: 600; color: var(--text-muted);
+            cursor: pointer; padding: 10px 20px; border-radius: 8px; transition: all 0.2s ease;
+        }
+        .nav-links button.active, .nav-links button:hover { color: var(--primary); background-color: var(--accent-blue); }
+
+        .page { display: none; padding: 25px 40px; width: 100%; max-width: 1400px; margin: 0 auto; flex: 1; }
+        .page.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Estilos Comuns (Portal) */
+        h1 { color: var(--text-main); font-size: 22px; font-weight: 800; margin-bottom: 15px; letter-spacing: -0.5px; }
+        h2 { font-size: 18px; color: var(--text-main); margin-bottom: 15px; }
+
+        /* ==========================================
+           PÁGINA 1: CALCULADORA
+        ========================================== */
+        .highlight-panel {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #DBEAFE 100%); border: 1px solid var(--accent-border);
+            border-radius: 16px; padding: 30px; display: flex; flex-wrap: wrap; gap: 30px; align-items: center;
+            margin-bottom: 30px; box-shadow: var(--shadow-md);
+        }
+        .input-group { flex: 1; min-width: 200px; }
+        .input-group label { display: block; font-weight: 700; font-size: 14px; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input { 
+            width: 100%; padding: 15px 20px; border: 2px solid #FFFFFF; border-radius: 12px; 
+            font-size: 24px; font-weight: 800; color: var(--text-main); outline: none;
+            background: rgba(255, 255, 255, 0.9); transition: all 0.2s; box-shadow: var(--shadow-sm);
+        }
+        .input-group input:focus { border-color: var(--primary); background: #FFFFFF; }
+
+        /* Toggle Switch */
+        .toggle-group { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.6); padding: 15px 20px; border-radius: 12px; }
+        .toggle-group label.title { font-weight: 700; color: var(--text-main); font-size: 15px; cursor: pointer; }
+        .switch { position: relative; display: inline-block; width: 52px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Grid de Planos */
+        .plans-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .plan-card {
+            background: var(--bg-card); border: 2px solid var(--border-light); border-radius: 16px; padding: 25px 20px; 
+            text-align: center; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .plan-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: #93C5FD; }
+        .plan-card.selected { border-color: var(--primary); background-color: var(--bg-card); box-shadow: 0 0 0 1px var(--primary), var(--shadow-lg); }
+        .plan-card.selected::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--primary); border-radius: 14px 14px 0 0; }
+        
+        .plan-badge { display: inline-block; background: var(--accent-blue); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 15px; }
+        .plan-title { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
+        
+        .plan-price { font-size: 15px; font-weight: 600; color: var(--text-muted); margin: 10px 0; }
+        .plan-price strong { color: var(--text-main); font-size: 18px; }
+        
+        .plan-total-container { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-light); }
+        .plan-total-label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+        .plan-total-val { font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+        
+        .btn-primary { 
+            display: block; width: 100%; background: var(--primary); color: white; border: none; 
+            padding: 18px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; 
+            text-align: center; text-decoration: none; margin-top: 30px; transition: all 0.3s; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35); }
+
+        /* ==========================================
+           PÁGINA 2: TABELAS DE PRECIFICAÇÃO
+        ========================================== */
+        .grid-tables { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: stretch; }
+        .table-container {
+            background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s; justify-content: space-between;
+        }
+        .table-container:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+        .table-container table { width: 100%; border-collapse: collapse; text-align: left; }
+        .table-container th { 
+            background-color: #F8FAFC; color: var(--text-muted); padding: 15px 18px; 
+            font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .table-header-title {
+            background-color: var(--bg-card); color: var(--text-main); padding: 18px; font-size: 19px; 
+            font-weight: 800; border-bottom: 2px solid var(--border-light); text-align: center;
+        }
+        .table-container td { 
+            padding: 15px 18px; border-bottom: 1px solid var(--border-light); 
+            font-size: 15px; color: var(--text-main); font-weight: 600; transition: background 0.2s;
+        }
+        .table-container tr:hover td { background-color: #F8FAFC; }
+        .table-container tr:last-child td { border-bottom: none; }
+        
+        .highlight-val { color: var(--primary); font-weight: 700; background: var(--accent-blue); padding: 5px 10px; border-radius: 12px; font-size: 14px; display: inline-block; }
+        .highlight-green { color: var(--success); font-weight: 700; background: var(--success-bg); padding: 5px 10px; border-radius: 12px; font-size: 14px; display: inline-block; }
+        .table-note { font-size: 13px; color: var(--text-muted); padding: 14px 18px; background: #F8FAFC; border-top: 1px dashed var(--border-light); line-height: 1.4; margin-top: auto; }
+
+        /* ==========================================
+           PÁGINA 3: GERADOR DE PROPOSTA PDF
+        ========================================== */
+        /* Força a fonte Montserrat apenas dentro da página 3 */
+        #page3 { font-family: 'Montserrat', sans-serif; background-color: #F4F7F6; padding-top: 20px; }
+        #page3 * { font-family: 'Montserrat', sans-serif; }
+        
+        .pdf-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .pdf-controls h1 { color: var(--pdf-primary); font-size: 20px; font-weight: 800; margin-bottom: 5px; }
+        .btn-print { background-color: var(--primary); color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-print:hover { background-color: var(--primary-hover); }
+
+        .a4-container { display: flex; flex-direction: column; gap: 40px; align-items: center; }
+        .a4-page {
+            width: 210mm; height: 297mm; background-color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative; overflow: hidden; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        }
+
+        .page-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
+        .page-content { position: relative; z-index: 2; padding: 20mm; height: 100%; display: flex; flex-direction: column; }
+
+        .a4-page *[contenteditable="true"] { border-bottom: 1px dashed #A0AEC0; outline: none; transition: background 0.2s; }
+        .a4-page *[contenteditable="true"]:hover, .a4-page *[contenteditable="true"]:focus { background: rgba(226, 232, 240, 0.8); border-bottom-color: var(--pdf-primary); }
+
+        .page-footer-logo { position: absolute; bottom: 15mm; left: 20mm; height: 40px; z-index: 3; }
+        .content-img { max-width: 100%; object-fit: contain; display: block; margin: 0 auto; }
+
+        /* Capa */
+        .page-1 .page-content { align-items: center; text-align: center; padding-top: 60mm; }
+        .page-1 .cover-logo { max-width: 250px; margin-bottom: 20px; }
+        .page-1 .cover-title { font-size: 24px; font-weight: 800; color: #000; margin-bottom: 35mm; }
+        .page-1 .cover-client { margin-bottom: 35mm; }
+        .page-1 .client-name { font-size: 22px; font-weight: 800; color: #000; margin-bottom: 5px; }
+        .page-1 .client-contact { font-size: 15px; color: #333; text-transform: uppercase;}
+        .page-1 .cover-consultant { margin-bottom: 20px; }
+        .page-1 .consultant-name { font-size: 16px; font-weight: 800; color: #000; margin-bottom: 3px; }
+        .page-1 .consultant-title { font-size: 15px; font-weight: 800; color: #000; margin-bottom: 3px;}
+        .page-1 .consultant-phone { font-size: 15px; color: #333; }
+        .page-1 .cover-validity { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid #000; width: fit-content; margin-left: auto; margin-right: auto; }
+        .page-1 .validity-label { background-color: var(--pdf-blue); color: white; padding: 8px 15px; font-weight: 700; font-size: 14px; }
+        .page-1 .validity-value { background-color: white; padding: 8px 20px; font-size: 14px; color: #000; width: 120px; }
+        .page-1 .cover-date { font-size: 14px; color: #333; }
+
+        /* Tipografia Interna do PDF */
+        .pdf-section-title { font-size: 21px; font-weight: 700; color: #000; margin-bottom: 18px; }
+        .pdf-body-text { font-size: 13.5px; line-height: 1.55; color: #333; margin-bottom: 14px; }
+        .pdf-custom-list { padding-left: 20px; font-size: 13.5px; line-height: 1.55; margin-bottom: 14px; }
+        .pdf-custom-list li { margin-bottom: 5px; }
+
+        /* Tabelas do PDF */
+        .pdf-table-title { font-size: 19px; font-weight: 700; text-align: center; margin-bottom: 15px; margin-top: 30px;}
+        
+        .pdf-table-roi { width: 100%; border-collapse: collapse; margin-bottom: 10px; text-align: center; border: 1px solid #000; }
+        .pdf-table-roi th { background-color: var(--pdf-primary); color: white; padding: 11px; font-size: 13.5px; font-weight: 700; border: 1px solid #000; text-transform: none; letter-spacing: 0;}
+        .pdf-table-roi td { padding: 11px; font-size: 13.5px; border: 1px solid #000; background-color: rgba(255,255,255,0.9); font-weight: 500;}
+        .pdf-table-roi td:first-child { background-color: #D9E1F2; font-weight: 700; }
+
+        .pdf-table-planos { width: 100%; border-collapse: collapse; text-align: left; border: 1px solid #000; margin-bottom: 30px; }
+        .pdf-table-planos td { padding: 11px; font-size: 13.5px; border: 1px solid #000; background-color: rgba(255,255,255,0.9); font-weight: 500;}
+        .pdf-table-planos td:first-child { background-color: var(--pdf-primary); color: white; font-weight: 700; width: 25%; text-align: center; }
+
+        .pdf-table-invest { width: 80%; margin: 0 auto; border-collapse: collapse; text-align: center; border: 2px solid #000; }
+        .pdf-table-invest td { padding: 7px 11px; font-size: 17px; border: 2px solid #000; font-weight: 500;}
+        .pdf-table-invest td:first-child { background-color: var(--pdf-primary); color: white; font-weight: 700; text-align: right; width: 60%; }
+        .pdf-table-invest td:last-child { background-color: rgba(255,255,255,0.9); }
+        .pdf-table-invest tr.row-green td:first-child { background-color: var(--pdf-green); color: #000; }
+
+        .guarantee-box { display: flex; align-items: center; width: 85%; margin: 35px auto 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .guarantee-icon { background: var(--pdf-primary); color: white; padding: 18px; text-align: center; width: 40%; font-weight: 700; font-size: 15px;}
+        .guarantee-text { padding: 18px; font-size: 12.5px; line-height: 1.45; color: #333; width: 60%;}
+
+        /* ==========================================
+           REGRAS DE IMPRESSÃO UNIVERSAIS
+        ========================================== */
+        @page { size: A4; margin: 0; }
+
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { background: white; margin: 0; padding: 0; height: auto; overflow: visible; }
+            
+            /* Esconde as outras abas e menu */
+            nav, .pdf-controls, #page1, #page2 { display: none !important; }
+            
+            /* Prepara o contêiner do PDF */
+            #page3 { display: block !important; padding: 0; margin: 0; background: white; }
+            .a4-container { gap: 0; padding: 0; }
+            .a4-page { box-shadow: none; margin: 0; padding: 0; page-break-after: always; border-radius: 0; }
+            
+            /* Remove edição tracejada mas protege a borda das tabelas */
+            :not(td)[contenteditable="true"] { border: none !important; background: transparent !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" alt="Contele Teams Logo">
+        <div class="nav-links">
+            <button class="active" onclick="showPage('page1', this)">Calculadora</button>
+            <button onclick="showPage('page2', this)">Tabelas de Precificação</button>
+            <button onclick="showPage('page3', this)">Gerador de Proposta</button>
+        </div>
+    </nav>
+
+    <div id="page1" class="page active">
+        <div class="highlight-panel">
+            <div class="input-group">
+                <label for="qty">Quantidade de Licenças</label>
+                <input type="number" id="qty" min="1" value="10" oninput="calculate()">
+            </div>
+            <div class="input-group">
+                <label for="discount">Desconto (%)</label>
+                <input type="number" id="discount" min="0" max="100" value="0" oninput="calculate()">
+            </div>
+            <div class="toggle-group">
+                <label class="switch">
+                    <input type="checkbox" id="comboToggle" onchange="calculate()">
+                    <span class="slider"></span>
+                </label>
+                <label class="title" for="comboToggle">Cliente Combo (Teams + Fleet)</label>
+            </div>
+        </div>
+
+        <div class="plans-grid" id="plansGrid">
+            <div class="plan-card selected" onclick="selectPlan('Mensal', this)">
+                <div>
+                    <div class="plan-title">Mensal</div>
+                    <div id="price-Mensal" class="plan-price"></div>
+                </div>
+                <div id="total-Mensal" class="plan-total-container"></div>
+            </div>
+            <div class="plan-card" onclick="selectPlan('Trimestral', this)">
+                <div>
+                    <div class="plan-title">Trimestral</div>
+                    <div id="price-Trimestral" class="plan-price"></div>
+                </div>
+                <div id="total-Trimestral" class="plan-total-container"></div>
+            </div>
+            <div class="plan-card" onclick="selectPlan('Semestral', this)">
+                <div>
+                    <div class="plan-badge">10% de desconto</div>
+                    <div class="plan-title">Semestral</div>
+                    <div id="price-Semestral" class="plan-price"></div>
+                </div>
+                <div id="total-Semestral" class="plan-total-container"></div>
+            </div>
+            <div class="plan-card" onclick="selectPlan('Anual', this)">
+                <div>
+                    <div class="plan-badge">15% de desconto</div>
+                    <div class="plan-title">Anual</div>
+                    <div id="price-Anual" class="plan-price"></div>
+                </div>
+                <div id="total-Anual" class="plan-total-container"></div>
+            </div>
+        </div>
+
+        <a href="https://app.contelege.com.br/subscription/new?" target="_blank" class="btn-primary">Avançar para Contratação Oficial →</a>
+    </div>
+
+    <div id="page2" class="page">        
+        <div class="grid-tables">
+            <div class="table-container">
+                <div>
+                    <div class="table-header-title">Tabela Padrão</div>
+                    <table>
+                        <thead>
+                            <tr><th>Quantidade</th><th style="text-align:right;">Valor mensal</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>4 a 40</td><td style="text-align:right; font-weight:800; color:var(--text-main);">R$ 59,90</td></tr>
+                            <tr><td>41 ou mais</td><td style="text-align:right; font-weight:800; color:var(--text-main);">R$ 49,90</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div>
+                    <div class="table-header-title">Planos Padrão</div>
+                    <table>
+                        <thead>
+                            <tr><th>Plano</th><th>Pagto.</th><th style="text-align:right;">Desc.</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Mensal</td><td>Cartão</td><td style="text-align:right; color:var(--text-muted);">-</td></tr>
+                            <tr><td>Trimestral</td><td>Boleto</td><td style="text-align:right; color:var(--text-muted);">-</td></tr>
+                            <tr><td>Semestral</td><td>Boleto</td><td style="text-align:right;"><span class="highlight-val">10%</span></td></tr>
+                            <tr><td>Anual</td><td>Boleto</td><td style="text-align:right;"><span class="highlight-val">15%</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div>
+                    <div class="table-header-title">Tabela Combo (Teams + Fleet)</div>
+                    <table>
+                        <thead>
+                            <tr><th>Quantidade</th><th style="text-align:right;">Valor mensal</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Qualquer faixa</td>
+                                <td style="text-align:right; font-weight:800; color:var(--primary);">R$ 49,90</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-note">
+                    <strong>Condição:</strong> Ser cliente do Fleet ou contratar ambos os produtos simultaneamente.
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div>
+                    <div class="table-header-title">Tabela Especial</div>
+                    <table>
+                        <thead>
+                            <tr><th>Qtd.</th><th>Preço</th><th style="text-align:right;">Desc.</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>101 - 300</td><td style="font-weight:700;">R$ 37,00</td><td style="text-align:right;"><span class="highlight-green">25%</span></td></tr>
+                            <tr><td>301 ou mais</td><td style="font-weight:700;">R$ 35,00</td><td style="text-align:right;"><span class="highlight-green">30%</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-note">
+                    <strong>Aviso:</strong> Necessária aprovação da diretoria (Leo ou Marco). Não cumulativo. Fechou na Oferta.
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div>
+                    <div class="table-header-title">Planos Especiais - 1º ciclo</div>
+                    <table>
+                        <thead>
+                            <tr><th>Plano</th><th>Pagto.</th><th style="text-align:right;">Desc.</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mensal <br><span style="font-size:13px; color:#94A3B8;">Faixa 5 a 40</span></td>
+                                <td>Cartão</td>
+                                <td style="text-align:right;"><span class="highlight-green">50%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Trimestral <br><span style="font-size:13px; color:#94A3B8;">Faixa 5 a 40</span></td>
+                                <td>Boleto</td>
+                                <td style="text-align:right;"><span class="highlight-green">25%</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-note">
+                    <strong>Aviso:</strong> Marcar no Pipedrive > Fechou na Oferta > Plano Especial.
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div>
+                    <div class="table-header-title">Tipos de Comissões</div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight:700;">Tabela Padrão</td>
+                                <td style="text-align:right; font-weight:800; font-size:20px; color:var(--primary);">R$ 40,00</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:700;">Tabela Especial</td>
+                                <td style="text-align:right; font-weight:800; font-size:20px; color:var(--primary);">R$ 32,00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-note">
+                    <strong>Obs:</strong> Aplicadas automaticamente conforme cupom e revisadas pelo Financeiro após contratação.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        
+        <div class="pdf-controls">
+            <div>
+                <h1>Gerador de Proposta (PDF)</h1>
+                <p style="color:var(--text-muted); font-family: 'Plus Jakarta Sans', sans-serif;">Os dados nas tabelas e textos principais são editáveis. Clique e altere antes de gerar o PDF.</p>
+            </div>
+            <button class="btn-print" onclick="window.print()">
+                <svg style="width:16px; height:16px; display:inline; vertical-align:text-bottom;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Gerar PDF / Imprimir
+            </button>
+        </div>
+
+        <div class="a4-container">
+            
+            <div class="a4-page page-1">
+                <img src="https://i.ibb.co/ZpyXk1gQ/1.jpg" class="page-bg" alt="Fundo Capa">
+                <div class="page-content">
+                    <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" alt="Contele Teams" class="cover-logo">
+                    <h1 class="cover-title">Orçamento e Proposta Comercial</h1>
+
+                    <div class="cover-client">
+                        <div class="client-name" contenteditable="true">Servis Eletronica</div>
+                        <div class="client-contact" contenteditable="true">A/C: EGIDIO HOLANDA</div>
+                    </div>
+
+                    <div class="cover-consultant">
+                        <div class="consultant-name" contenteditable="true">Daniel Garcia Dias</div>
+                        <div class="consultant-title">Consultor Especialista</div>
+                        <div class="consultant-phone" contenteditable="true">(11) 97357-6141</div>
+                    </div>
+
+                    <div class="cover-validity">
+                        <div class="validity-label">Validade da proposta</div>
+                        <div class="validity-value" contenteditable="true">20 dias</div>
+                    </div>
+
+                    <div class="cover-date" contenteditable="true" id="propDataHoje"></div>
+                </div>
+            </div>
+
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="page-content">
+                    <h2 class="pdf-section-title">Olá, <span contenteditable="true">EGIDIO</span>!</h2>
+                    <p class="pdf-body-text">Ficamos felizes pelo seu interesse no <strong>Contele Teams</strong>, o sistema de Gestão de Equipes Externas com mais de 1.500 clientes ativos.</p>
+                    <p class="pdf-body-text">O objetivo dessa proposta é fornecer a solução tecnológica da Contele para gestão eficiente de equipes externas, com foco na <strong>otimização da roteirização, controle de reembolso de quilometragem, monitoramento em tempo real e geração de relatórios personalizados</strong>, visando atender as necessidades específicas da <strong contenteditable="true">Servis Eletronica</strong>, promovendo aumento de produtividade, redução de custos operacionais e melhoria no acompanhamento das atividades dos vendedores e colaboradores.</p>
+                    
+                    <h2 class="pdf-section-title" style="text-align: center; margin-top: 30px;">Escopo da Solução</h2>
+                    <ul class="pdf-custom-list">
+                        <li>Controle e acompanhamento de visitas externas com <strong>check-in geolocalizado</strong></li>
+                        <li>Formulários <strong>customizáveis</strong> para registro de visitas</li>
+                        <li>Gestão de <strong>despesas avulsas e quilometragem</strong>, com comprovantes</li>
+                        <li>Painéis de indicadores e produtividade (dashboards integráveis ao Looker Studio)</li>
+                        <li>Aplicativo disponível para iOS e Android com <strong>funcionamento offline</strong></li>
+                        <li>Consultoria especializada para implantação e onboarding</li>
+                    </ul>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <img src="https://i.ibb.co/60sHBzRt/2.png" alt="Escopo da Solução" class="content-img" style="max-height: 390px;">
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" class="page-footer-logo">
+            </div>
+
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="page-content" style="padding-bottom: 30mm;">
+                    <div style="display: flex; gap: 18px; margin-bottom: 22px; align-items: center;">
+                        <div style="flex: 1;">
+                            <h2 class="pdf-section-title">Controle de Visitas</h2>
+                            <p class="pdf-body-text">A gestão de equipes externas é aprimorada pelo uso de check-in e check-out via GPS, garantindo o registro preciso. Pelo app, a equipe preenche digitalmente os dados da visita — incluindo fotos e assinaturas — eliminando o uso de papéis.</p>
+                            <p class="pdf-body-text" style="margin-bottom: 0;">Em tempo real, o gestor acompanha a localização de todos e acessa o Relatório de Visitas. Assim, é possível identificar clientes não atendidos, planejar novas rotas e otimizar tempo e recursos operacionais.</p>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <img src="https://i.ibb.co/VpNgVy2v/3.png" alt="Controle de Visitas" class="content-img" style="max-height: 205px;">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 18px; margin-bottom: 22px; align-items: center;">
+                        <div style="flex: 1; text-align: center;">
+                            <img src="https://i.ibb.co/PzsxvWS2/4.png" alt="Monitoramento Mapa" class="content-img" style="max-height: 170px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <h2 class="pdf-section-title">Monitoramento da Equipe Externa</h2>
+                            <p class="pdf-body-text">Com o Mapa da Equipe, o gestor consegue visualizar e monitorar toda a equipe externa em tempo real, obtendo a localização atual de cada colaborador de maneira simples e muito intuitiva.</p>
+                            <p class="pdf-body-text" style="margin-bottom: 0;">Para uma análise aprofundada, o Relatório de Monitoramento oferece dados essenciais da rotina, como histórico de login e logout, uso de localização fictícia e nível de bateria, garantindo um acompanhamento preciso.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 18px; align-items: center;">
+                        <div style="flex: 1;">
+                            <h2 class="pdf-section-title">Checklist Digital</h2>
+                            <p class="pdf-body-text">Crie checklists personalizadas para suas visitas, com dezenas de tipos de perguntas. Defina questões obrigatórias para garantir a coleta de informações estratégicas, evitar esquecimentos e tornar as visitas mais ágeis.</p>
+                            <p class="pdf-body-text" style="margin-bottom: 0;">Com o Contele Teams, você pode usar campos condicionais que guiam automaticamente o colaborador às seções relevantes no aplicativo. Depois, basta analisar todas as respostas no painel de forma global ou individual.</p>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <img src="https://i.ibb.co/C575tDjL/5.png" alt="Checklist App" class="content-img" style="max-height: 180px;">
+                        </div>
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" class="page-footer-logo">
+            </div>
+
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="page-content">
+                    <h2 class="pdf-section-title">Ordem de Serviço Digital</h2>
+                    <p class="pdf-body-text">A Ordem de Serviço Digital oferece todos os detalhes da visita para você e seu cliente, incluindo logo personalizado, horários de check-in e check-out, fotos, comentários, checklists, assinatura digital e envio automático por e-mail.</p>
+                    
+                    <div style="text-align: center; margin: 18px 0;">
+                        <img src="https://i.ibb.co/v4dWtZDF/6.png" alt="Ordem de Serviço" class="content-img" style="max-height: 240px;">
+                    </div>
+
+                    <p class="pdf-body-text">Após a visita, a OS pode ser enviada pelo funcionário via e-mail ou WhatsApp, ou você pode enviá-la pelo computador, verificando e editando as informações conforme necessário. Além disso, você pode configur preferências, como envio automático e exibição de formulários e comentários, adaptando a OS às suas necessidades.</p>
+
+                    <h2 class="pdf-section-title" style="margin-top: 45px;">Relatório de Visitas</h2>
+                    <p class="pdf-body-text">O gestor acompanha em tempo real a localização e produtividade das equipes, editando e exportando relatórios detalhados de visitas, com filtros personalizáveis, exportação para Excel e PDF, e fácil restauração de visitas canceladas, garantindo total controle e agilidade no gerenciamento.</p>
+
+                    <div style="text-align: center; margin: 18px 0;">
+                        <img src="https://i.ibb.co/xbhSxbG/7.png" alt="Relatório de Visitas" class="content-img" style="max-height: 240px;">
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" class="page-footer-logo">
+            </div>
+
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="page-content">
+                    <h2 class="pdf-section-title">Reembolso de KM Rodado e Avulso</h2>
+                    <p class="pdf-body-text">Por padrão, o Contele Teams utiliza o endereço do primeiro check-in do dia como ponto de partida e o último check-in como ponto de chegada. Isso significa que o reembolso de KM rodado será contabilizado entre esses dois pontos.</p>
+                    <p class="pdf-body-text">Durante o período entre o primeiro e o último check-in, o sistema calcula as rotas mais eficientes para o usuário. Isso pode resultar em alterações caso o gestor tenha planejado a rota previamente e ocorra congestionamento ou desvio inesperado durante o dia.</p>
+                    
+                    <div style="text-align: center; margin: 18px auto; width: 80%;">
+                        <img src="https://i.ibb.co/Ndhsc26q/8.png" alt="Rota no Mapa" class="content-img" style="max-height: 265px;">
+                    </div>
+
+                    <p class="pdf-body-text">Além do reembolso por KM rodado, feito automaticamente pelo app Contele Equipes, o usuário pode realizar lançamentos manuais de gastos reembolsáveis e não reembolsáveis, através dos reembolsos avulsos.</p>
+
+                    <div style="display: flex; gap: 35px; margin-top: 25px; align-items: center;">
+                        <div style="flex: 1; text-align: center;">
+                            <img src="https://i.ibb.co/fsT6gxz/9.png" alt="Reembolso App" class="content-img" style="max-height: 335px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <p class="pdf-body-text" style="font-size: 15px; font-weight: 600;">No aplicativo, o usuário pode lançar reembolsos de:</p>
+                            <ul class="pdf-custom-list" style="list-style: none; padding: 0;">
+                                <li><span style="color:var(--pdf-blue);">●</span> Transporte</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Estacionamento</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Pedágio</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Alimentação</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Hospedagem</li>
+                                <li>Entre outros</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" class="page-footer-logo">
+            </div>
+
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="page-content">
+                    <h2 class="pdf-section-title">Dashboard Personalizado</h2>
+                    <p class="pdf-body-text">Estamos <strong>100% integrados ao Looker Studio</strong>, a ferramenta de BI do Google!</p>
+                    <p class="pdf-body-text">Conecte os dados do Contele Teams ao Looker, e crie dashboards de acordo com a necessidade da sua operação.</p>
+                    <p class="pdf-body-text">Economize horas e aumente em até <strong>22% sua lucratividade</strong> com decisões baseadas em dados.</p>
+                    
+                    <div style="text-align: center; margin: 25px 0;">
+                        <img src="https://i.ibb.co/nsSKvv9Q/10.png" alt="Dashboard Looker Studio" class="content-img" style="max-height: 625px;">
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" class="page-footer-logo">
+            </div>
+
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="page-content">
+                    <h2 class="pdf-table-title">ROI (Retorno sobre Investimento)</h2>
+                    <table class="pdf-table-roi">
+                        <thead>
+                            <tr>
+                                <th>Funcionalidade</th>
+                                <th>Economia Estimada</th>
+                                <th>Justificativa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td contenteditable="true">Reembolso de despesas</td>
+                                <td contenteditable="true">20% de economia</td>
+                                <td contenteditable="true">Redução de erros e aumento na transparência</td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="true">Controle de Visitas</td>
+                                <td contenteditable="true">15% de aumento na produtividade</td>
+                                <td contenteditable="true">Aumento de eficiência com roteirização inteligente</td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="true">Horas Improdutivas</td>
+                                <td contenteditable="true">30% de redução</td>
+                                <td contenteditable="true">Eliminação de processos manuais e otimização de tempo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="font-size: 11px; font-style: italic; text-align: center; color: #555; margin-bottom: 28px;" contenteditable="true">
+                        Esses percentuais são estimativas baseadas em estudos anteriores.<br>
+                        A economia real pode variar conforme o cenário específico da sua empresa.
+                    </p>
+
+                    <h2 class="pdf-table-title">Planos</h2>
+                    <table class="pdf-table-planos">
+                        <tr>
+                            <td contenteditable="true">Pré-pago</td>
+                            <td contenteditable="true">Não há contrato de fidelidade nem multas de cancelamento.</td>
+                        </tr>
+                    </table>
+
+                    <h2 class="pdf-table-title">Investimento</h2>
+                    <table class="pdf-table-invest">
+                        <tbody>
+                            <tr>
+                                <td contenteditable="true">Quantidade de Usuários</td>
+                                <td contenteditable="true" id="calc-qtd">60</td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="true">Valor por Usuário</td>
+                                <td contenteditable="true" id="calc-valor">R$ 49,90</td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="true">Mensal - Cartão de Crédito</td>
+                                <td id="calc-mensal">R$ 2.994,00</td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="true">Boleto Trimestral</td>
+                                <td id="calc-trim">R$ 8.982,00</td>
+                            </tr>
+                            <tr class="row-green">
+                                <td contenteditable="true">10% desconto Boleto Semestral</td>
+                                <td id="calc-sem">R$ 16.167,60</td>
+                            </tr>
+                            <tr class="row-green">
+                                <td contenteditable="true">15% desconto Boleto Anual</td>
+                                <td id="calc-anu">R$ 30.538,80</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="guarantee-box">
+                        <div class="guarantee-icon">
+                            <span style="font-size: 28px; display: block; margin-bottom: 5px;">🛡️</span>
+                            <span contenteditable="true">Garantia Risco Zero<br><span style="font-size: 11.5px; font-weight: normal;">Contrate sem medo</span></span>
+                        </div>
+                        <div class="guarantee-text" contenteditable="true">
+                            Se em 30 dias você não ficar satisfeito, pode cancelar o contrato sem custo e sem burocracias.
+                        </div>
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" class="page-footer-logo">
+            </div>
+
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="page-content">
+                    <h2 class="pdf-section-title" style="text-align: center; margin-top: 30px;">As melhores equipes do Brasil utilizam o Contele Teams</h2>
+                    
+                    <div style="text-align: center; margin: 22px 0;">
+                        <img src="https://i.ibb.co/HTxnfwB0/11.png" alt="Logos dos Clientes" class="content-img" style="width: 100%; max-height: 335px; object-fit: contain;">
+                    </div>
+
+                    <h2 class="pdf-section-title" style="text-align: center; margin-top: 22px;">Próximos passos</h2>
+
+                    <div style="text-align: center; margin: 18px -20mm 20mm -20mm;">
+                        <img src="https://i.ibb.co/CsbYbNbY/12.png" alt="Roadmap de Contratação" style="width: 100%; max-height: 450px; object-fit: contain; display: block;">
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/YFRS0XGF/oie-transparent.png" class="page-footer-logo">
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Função de navegação das abas do portal
+        function showPage(pageId, btnElement) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-links button').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // ==========================================
+        // LÓGICA DA ABA CALCULADORA
+        // ==========================================
+        let currentSelectedPlan = 'Mensal';
+        
+        const planDefaults = {
+            'Mensal': 0,
+            'Trimestral': 0,
+            'Semestral': 10,
+            'Anual': 15
+        };
+
+        function selectPlan(planName, cardElement) {
+            document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            currentSelectedPlan = planName;
+            document.getElementById('discount').value = planDefaults[planName];
+            calculate();
+        }
+
+        function calculate() {
+            const qty = parseInt(document.getElementById('qty').value) || 0;
+            const isCombo = document.getElementById('comboToggle').checked;
+            const inputValue = parseFloat(document.getElementById('discount').value) || 0;
+
+            let basePricePerUser = 59.90;
+            if (isCombo || qty >= 41) {
+                basePricePerUser = 49.90;
+            }
+
+            const isManualDiscount = inputValue !== planDefaults[currentSelectedPlan];
+            const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            const plans = [
+                { id: 'Mensal', months: 1 },
+                { id: 'Trimestral', months: 3 },
+                { id: 'Semestral', months: 6 },
+                { id: 'Anual', months: 12 }
+            ];
+
+            plans.forEach(plan => {
+                let planDiscount = isManualDiscount ? inputValue : planDefaults[plan.id];
+                let finalPricePerUser = basePricePerUser * (1 - (planDiscount / 100));
+                let planTotal = finalPricePerUser * qty * plan.months;
+                
+                document.getElementById(`price-${plan.id}`).innerHTML = `Licença: <strong>${formatter.format(finalPricePerUser)}</strong> /mês`;
+                
+                let label = plan.id === 'Mensal' ? 'Faturamento Total:' : `Faturado a cada ${plan.months} meses:`;
+                
+                document.getElementById(`total-${plan.id}`).innerHTML = `
+                    <div class="plan-total-label">${label}</div>
+                    <div class="plan-total-val">${formatter.format(planTotal)}</div>
+                `;
+            });
+        }
+
+        // ==========================================
+        // LÓGICA DO GERADOR DE PROPOSTA PDF
+        // ==========================================
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function extrairNumero(texto) {
+            let limpo = texto.replace(/R\$\s?/g, '').replace(/\./g, '').trim();
+            limpo = limpo.replace(',', '.');
+            return parseFloat(limpo);
+        }
+
+        function calcularValoresPDF() {
+            const elQtd = document.getElementById('calc-qtd');
+            const elValor = document.getElementById('calc-valor');
+
+            const qtd = parseInt(elQtd.innerText.trim(), 10);
+            const valorUn = extrairNumero(elValor.innerText);
+
+            if (!isNaN(qtd) && !isNaN(valorUn)) {
+                const mensal = qtd * valorUn;
+                const trimestral = mensal * 3;
+                const semestral = (mensal * 6) * 0.90;
+                const anual = (mensal * 12) * 0.85;
+
+                document.getElementById('calc-mensal').innerText = formatarMoeda(mensal);
+                document.getElementById('calc-trim').innerText = formatarMoeda(trimestral);
+                document.getElementById('calc-sem').innerText = formatarMoeda(semestral);
+                document.getElementById('calc-anu').innerText = formatarMoeda(anual);
+            }
+        }
+
+        // Inicialização Global
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa a aba da calculadora
+            calculate(); 
+            
+            // Define a data atual na capa do PDF
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const today = new Date().toLocaleDateString('pt-BR', options);
+            document.getElementById('propDataHoje').innerText = today; 
+
+            // Adiciona ouvintes para recálculo na tabela do PDF
+            document.getElementById('calc-qtd').addEventListener('input', calcularValoresPDF);
+            document.getElementById('calc-valor').addEventListener('input', calcularValoresPDF);
+        });
+    </script>
+</body>
+</html>
