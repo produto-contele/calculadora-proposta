@@ -313,8 +313,8 @@
                             <tr><th>Quantidade</th><th style="text-align:right;">Valor mensal</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td>4 a 40</td><td style="text-align:right; font-weight:800; color:var(--text-main);">R$ 59,90</td></tr>
-                            <tr><td>41 ou mais</td><td style="text-align:right; font-weight:800; color:var(--text-main);">R$ 49,90</td></tr>
+                            <tr><td>4 a 40</td><td style="text-align:right; font-weight:800; color:var(--text-main);">R$ 62,50</td></tr>
+                            <tr><td>41 ou mais</td><td style="text-align:right; font-weight:800; color:var(--text-main);">R$ 52,00</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -347,7 +347,7 @@
                         <tbody>
                             <tr>
                                 <td>Qualquer faixa</td>
-                                <td style="text-align:right; font-weight:800; color:var(--primary);">R$ 49,90</td>
+                                <td style="text-align:right; font-weight:800; color:var(--primary);">R$ 52,00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -365,8 +365,8 @@
                             <tr><th>Qtd.</th><th>Preço</th><th style="text-align:right;">Desc.</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td>101 - 300</td><td style="font-weight:700;">R$ 37,00</td><td style="text-align:right;"><span class="highlight-green">25%</span></td></tr>
-                            <tr><td>301 ou mais</td><td style="font-weight:700;">R$ 35,00</td><td style="text-align:right;"><span class="highlight-green">30%</span></td></tr>
+                            <tr><td>101 - 300</td><td style="font-weight:700;">R$ 39,00</td><td style="text-align:right;"><span class="highlight-green">25%</span></td></tr>
+                            <tr><td>301 ou mais</td><td style="font-weight:700;">R$ 36,00</td><td style="text-align:right;"><span class="highlight-green">30%</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -650,23 +650,23 @@
                             </tr>
                             <tr>
                                 <td contenteditable="true">Valor por Usuário</td>
-                                <td contenteditable="true" id="calc-valor">R$ 49,90</td>
+                                <td contenteditable="true" id="calc-valor">R$ 52,00</td>
                             </tr>
                             <tr>
                                 <td contenteditable="true">Mensal - Cartão de Crédito</td>
-                                <td id="calc-mensal">R$ 2.994,00</td>
+                                <td id="calc-mensal">R$ 3.120,00</td>
                             </tr>
                             <tr>
                                 <td contenteditable="true">Boleto Trimestral</td>
-                                <td id="calc-trim">R$ 8.982,00</td>
+                                <td id="calc-trim">R$ 9.360,00</td>
                             </tr>
                             <tr class="row-green">
                                 <td contenteditable="true">10% desconto Boleto Semestral</td>
-                                <td id="calc-sem">R$ 16.167,60</td>
+                                <td id="calc-sem">R$ 16.848,00</td>
                             </tr>
                             <tr class="row-green">
                                 <td contenteditable="true">15% desconto Boleto Anual</td>
-                                <td id="calc-anu">R$ 30.538,80</td>
+                                <td id="calc-anu">R$ 31.824,00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -740,9 +740,10 @@
             const isCombo = document.getElementById('comboToggle').checked;
             const inputValue = parseFloat(document.getElementById('discount').value) || 0;
 
-            let basePricePerUser = 59.90;
+            // Valores de precificação atualizados
+            let basePricePerUser = 62.50;
             if (isCombo || qty >= 41) {
-                basePricePerUser = 49.90;
+                basePricePerUser = 52.00;
             }
 
             const isManualDiscount = inputValue !== planDefaults[currentSelectedPlan];
@@ -817,6 +818,9 @@
             // Adiciona ouvintes para recálculo na tabela do PDF
             document.getElementById('calc-qtd').addEventListener('input', calcularValoresPDF);
             document.getElementById('calc-valor').addEventListener('input', calcularValoresPDF);
+
+            // Garante que o PDF receba os cálculos atualizados em tempo de carregamento
+            calcularValoresPDF();
         });
     </script>
 </body>
