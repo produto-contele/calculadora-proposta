@@ -21,6 +21,7 @@
             --shadow-md: 0 4px 15px rgba(0,0,0,0.03);
             --shadow-lg: 0 10px 25px rgba(37, 99, 235, 0.1);
             --success: #10B981;
+            --success-dark: #059669;
             --success-bg: #D1FAE5;
 
             /* Cores específicas do PDF (Gerador de Proposta) */
@@ -100,6 +101,9 @@
         
         .plan-price { font-size: 15px; font-weight: 600; color: var(--text-muted); margin: 10px 0; }
         .plan-price strong { color: var(--text-main); font-size: 18px; }
+
+        /* Economia (desconto em R$) dos planos */
+        .plan-savings { font-size: 17px; font-weight: 800; color: var(--success-dark); margin-top: 10px; letter-spacing: -0.3px; }
         
         .plan-total-container { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-light); }
         .plan-total-label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
@@ -761,8 +765,16 @@
                 let planDiscount = isManualDiscount ? inputValue : planDefaults[plan.id];
                 let finalPricePerUser = basePricePerUser * (1 - (planDiscount / 100));
                 let planTotal = finalPricePerUser * qty * plan.months;
+
+                // Economia em relação ao valor cheio do período
+                let fullTotal = basePricePerUser * qty * plan.months;
+                let savings = fullTotal - planTotal;
+                let savingsHtml = savings > 0
+                    ? `<div class="plan-savings">Desconto de ${formatter.format(savings)}</div>`
+                    : '';
                 
-                document.getElementById(`price-${plan.id}`).innerHTML = `Licença: <strong>${formatter.format(finalPricePerUser)}</strong> /mês`;
+                document.getElementById(`price-${plan.id}`).innerHTML =
+                    `Licença: <strong>${formatter.format(finalPricePerUser)}</strong> /mês${savingsHtml}`;
                 
                 let label = plan.id === 'Mensal' ? 'Faturamento Total:' : `Faturado a cada ${plan.months} meses:`;
                 
