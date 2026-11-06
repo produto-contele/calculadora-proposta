@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contele Teams - Portal Comercial & Gerador de Proposta</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             /* Cores do Portal Comercial */
@@ -29,6 +29,13 @@
             --pdf-blue: #4F46E5;
             --pdf-green: #00B050;
             --pdf-text: #333333;
+
+            /* Cores Black Friday */
+            --bf-black: #0A0A0C;
+            --bf-yellow: #FFCE1F;
+            --bf-white: #F5F5F2;
+            --bf-muted: #B8B8B2;
+            --bf-line: #2E2E33;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -49,6 +56,8 @@
             cursor: pointer; padding: 10px 20px; border-radius: 8px; transition: all 0.2s ease;
         }
         .nav-links button.active, .nav-links button:hover { color: var(--primary); background-color: var(--accent-blue); }
+        .nav-links button.nav-bf { color: var(--bf-black); }
+        .nav-links button.nav-bf.active, .nav-links button.nav-bf:hover { color: var(--bf-yellow); background-color: var(--bf-black); }
 
         .page { display: none; padding: 25px 40px; width: 100%; max-width: 1400px; margin: 0 auto; flex: 1; }
         .page.active { display: block; animation: fadeIn 0.4s ease; }
@@ -220,6 +229,74 @@
         .guarantee-text { padding: 18px; font-size: 12.5px; line-height: 1.45; color: #333; width: 60%;}
 
         /* ==========================================
+           PÁGINA 4: PROPOSTA BLACK FRIDAY
+        ========================================== */
+        #page4 { font-family: 'Montserrat', sans-serif; background-color: #E7E7E3; padding-top: 20px; }
+        #page4 * { font-family: 'Montserrat', sans-serif; }
+
+        .bf-controls { background: var(--bf-black); color: var(--bf-white); padding: 18px 22px; border-radius: 8px; border-bottom: 3px solid var(--bf-yellow); display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 30px; }
+        .bf-controls-title { display: flex; flex-direction: column; gap: 4px; min-width: 200px; }
+        .bf-controls-title span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--bf-yellow); }
+        .bf-controls-title strong { font-size: 18px; font-weight: 800; }
+        .bf-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; flex: 1; min-width: 300px; }
+        .bf-fields label { display: flex; flex-direction: column; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--bf-muted); }
+        .bf-fields label.bf-hl { color: var(--bf-yellow); }
+        .bf-fields input[type="text"], .bf-fields input[type="number"] { background: #1A1A1E; border: 1px solid var(--bf-line); border-radius: 6px; padding: 8px 10px; color: #fff; font-size: 13px; font-weight: 600; outline: none; }
+        .bf-fields label.bf-hl input { border-color: var(--bf-yellow); font-weight: 700; }
+        .bf-fields label.bf-check { flex-direction: row; align-items: center; gap: 8px; font-size: 12px; color: var(--bf-white); letter-spacing: 0; cursor: pointer; padding-bottom: 8px; }
+        .bf-fields label.bf-check input { width: 18px; height: 18px; accent-color: var(--bf-yellow); }
+        .btn-print-bf { background: var(--bf-yellow); color: var(--bf-black); border: none; border-radius: 8px; padding: 12px 22px; font-size: 14px; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+        .btn-print-bf:hover { background: #FFE066; }
+
+        .bf-dark { background-color: var(--bf-black) !important; color: var(--bf-white); }
+        .bf-stripes { position: absolute; background: repeating-linear-gradient(135deg, #141417 0 6px, var(--bf-black) 6px 14px); }
+        .bf-band { position: absolute; top: 0; left: 0; right: 0; height: 10mm; background: var(--bf-black); z-index: 3; display: flex; align-items: center; justify-content: space-between; padding: 0 20mm; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+        .bf-band span:first-child { color: var(--bf-yellow); }
+        .bf-band span:last-child { color: var(--bf-white); }
+        .bf-content { padding-top: 22mm; }
+        .bf-chip { background: var(--bf-yellow); color: var(--bf-black); font-weight: 900; white-space: nowrap; flex-shrink: 0; }
+        .bf-strip { display: flex; align-items: center; gap: 14px; background: var(--bf-black); color: var(--bf-white); padding: 12px 16px; }
+
+        /* Capa BF */
+        .bf-cover-inner { position: relative; z-index: 2; height: 100%; padding: 18mm; display: flex; flex-direction: column; }
+        .bf-cover-top { display: flex; justify-content: space-between; align-items: center; }
+        .bf-date-badge { font-size: 12px; font-weight: 800; letter-spacing: 3px; color: var(--bf-yellow); border: 1.5px solid var(--bf-yellow); padding: 7px 12px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+        .bf-kicker { font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: 10px; color: var(--bf-muted); }
+        .bf-big { font-size: 124px; font-weight: 900; line-height: .88; letter-spacing: -6px; }
+        .bf-offer { display: flex; align-items: stretch; margin-top: 12mm; width: fit-content; }
+        .bf-offer-pct { background: var(--bf-yellow); color: var(--bf-black); padding: 10px 18px; display: flex; align-items: baseline; gap: 6px; }
+        .bf-offer-txt { border: 2px solid var(--bf-yellow); border-left: none; padding: 12px 18px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+        .bf-tape { position: absolute; left: -20mm; right: -20mm; top: 178mm; transform: rotate(-4deg); background: var(--bf-yellow); color: var(--bf-black); padding: 9px 0; white-space: nowrap; overflow: hidden; font-size: 15px; font-weight: 900; letter-spacing: 3px; z-index: 3; }
+        .bf-cover-bottom { position: absolute; left: 18mm; right: 18mm; bottom: 18mm; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; align-items: end; }
+        .bf-validity { display: flex; border: 1.5px solid var(--bf-white); }
+        .bf-validity div:first-child { background: var(--bf-white); color: var(--bf-black); padding: 8px 12px; font-size: 12px; font-weight: 800; }
+        .bf-validity div:last-child { padding: 8px 14px; font-size: 12px; font-weight: 700; }
+
+        /* Investimento BF */
+        .bf-summary { display: grid; grid-template-columns: 1fr 1fr 1.3fr; margin-top: 10mm; border: 1.5px solid var(--bf-line); }
+        .bf-summary > div { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+        .bf-summary > div:not(:last-child) { border-right: 1.5px solid var(--bf-line); }
+        .bf-summary .bf-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--bf-muted); }
+        .bf-summary .bf-value { font-size: 30px; font-weight: 900; letter-spacing: -1px; }
+        .bf-summary .bf-yellow-box { background: var(--bf-yellow); color: var(--bf-black); }
+        .bf-summary .bf-yellow-box .bf-label { color: var(--bf-black); font-weight: 800; }
+        .bf-table { width: 100%; border-collapse: collapse; margin-top: 9mm; }
+        .bf-table th { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--bf-muted); padding: 0 8px 10px; border-bottom: 1.5px solid var(--bf-white); text-align: right; }
+        .bf-table th:first-child { text-align: left; padding-left: 0; }
+        .bf-table th.bf-th-hl { color: var(--bf-yellow); font-weight: 800; }
+        .bf-table td { padding: 14px 8px; border-bottom: 1px solid var(--bf-line); text-align: right; vertical-align: top; }
+        .bf-table td:first-child { text-align: left; padding-left: 0; }
+        .bf-table td:last-child { padding-right: 0; }
+        .bf-plano { font-size: 15px; font-weight: 800; }
+        .bf-sub { font-size: 10.5px; font-weight: 500; color: var(--bf-muted); margin-top: 3px; }
+        .bf-de { font-size: 13px; font-weight: 600; color: #8E8E88; text-decoration: line-through; }
+        .bf-por { font-size: 19px; font-weight: 900; color: var(--bf-yellow); letter-spacing: -.5px; }
+        .bf-eco { font-size: 13px; font-weight: 800; color: var(--bf-white); }
+        .bf-guarantee { margin-top: auto; display: flex; align-items: stretch; border: 1.5px solid var(--bf-white); }
+        .bf-guarantee div:first-child { background: var(--bf-white); color: var(--bf-black); padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 2px; width: 38%; }
+        .bf-guarantee div:last-child { padding: 14px 18px; font-size: 12px; line-height: 1.45; display: flex; align-items: center; }
+
+        /* ==========================================
            REGRAS DE IMPRESSÃO UNIVERSAIS
         ========================================== */
         @page { size: A4; margin: 0; }
@@ -228,11 +305,12 @@
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             body { background: white; margin: 0; padding: 0; height: auto; overflow: visible; }
             
-            /* Esconde as outras abas e menu */
-            nav, .pdf-controls, #page1, #page2 { display: none !important; }
+            /* Esconde o menu, os controles e as abas não ativas */
+            nav, .pdf-controls, .bf-controls, #page1, #page2 { display: none !important; }
+            .page:not(.active) { display: none !important; }
             
-            /* Prepara o contêiner do PDF */
-            #page3 { display: block !important; padding: 0; margin: 0; background: white; }
+            /* Prepara o contêiner do PDF (imprime a proposta da aba ativa) */
+            #page3.active, #page4.active { display: block !important; padding: 0; margin: 0; background: white; animation: none; max-width: none; }
             .a4-container { gap: 0; padding: 0; }
             .a4-page { box-shadow: none; margin: 0; padding: 0; page-break-after: always; border-radius: 0; }
             
@@ -249,6 +327,7 @@
             <button class="active" onclick="showPage('page1', this)">Calculadora</button>
             <button onclick="showPage('page2', this)">Tabelas de Precificação</button>
             <button onclick="showPage('page3', this)">Gerador de Proposta</button>
+            <button class="nav-bf" onclick="showPage('page4', this)">Proposta Black Friday</button>
         </div>
     </nav>
 
@@ -710,6 +789,298 @@
         </div>
     </div>
 
+    <!-- ==========================================
+         PÁGINA 4: PROPOSTA BLACK FRIDAY
+    ========================================== -->
+    <div id="page4" class="page">
+
+        <div class="bf-controls">
+            <div class="bf-controls-title">
+                <span>BLACK FRIDAY · 01 A 30/11</span>
+                <strong>Gerador de Proposta</strong>
+            </div>
+            <div class="bf-fields">
+                <label>CLIENTE<input type="text" id="bf-cliente" value="Servis Eletronica" oninput="atualizarBF()"></label>
+                <label>A/C<input type="text" id="bf-contato" value="A/C: EGIDIO HOLANDA" oninput="atualizarBF()"></label>
+                <label>CONSULTOR(A)<input type="text" id="bf-consultor" value="Tauany Patrícia" oninput="atualizarBF()"></label>
+                <label>CARGO<input type="text" id="bf-cargo" value="Consultora Especialista" oninput="atualizarBF()"></label>
+                <label>TELEFONE<input type="text" id="bf-telefone" value="(13) 99702-8341" oninput="atualizarBF()"></label>
+                <label>VALIDADE<input type="text" id="bf-validade" value="Até 30/11" oninput="atualizarBF()"></label>
+                <label class="bf-hl">LICENÇAS<input type="number" id="bf-qtd" min="5" value="60" oninput="atualizarBF()"></label>
+                <label class="bf-hl">VALOR/USUÁRIO (R$)<input type="number" id="bf-preco" step="0.01" placeholder="Auto" oninput="atualizarBF()"></label>
+                <label class="bf-check"><input type="checkbox" id="bf-combo" onchange="atualizarBF()">Combo (Teams + Fleet)</label>
+            </div>
+            <button class="btn-print-bf" onclick="window.print()">Gerar PDF / Imprimir</button>
+        </div>
+
+        <div class="a4-container">
+
+            <!-- 01 Capa -->
+            <div class="a4-page bf-dark">
+                <div class="bf-stripes" style="top:0; right:0; width:72mm; height:100%;"></div>
+                <div class="bf-cover-inner">
+                    <div class="bf-cover-top">
+                        <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" alt="Contele Teams" style="height:44px; display:block;">
+                        <div class="bf-date-badge">01 — 30 NOV</div>
+                    </div>
+                    <div style="margin-top:24mm; display:flex; flex-direction:column;">
+                        <div class="bf-kicker">CONTELE TEAMS</div>
+                        <div class="bf-big" style="margin-top:8px;">BLACK</div>
+                        <div class="bf-big" style="color:var(--bf-yellow);">FRIDAY</div>
+                    </div>
+                    <div class="bf-offer">
+                        <div class="bf-offer-pct">
+                            <span style="font-size:68px; font-weight:900; line-height:1; letter-spacing:-3px;">50%</span>
+                            <span style="font-size:26px; font-weight:900;">OFF</span>
+                        </div>
+                        <div class="bf-offer-txt">
+                            <span style="font-size:16px; font-weight:800;">nos 3 primeiros meses</span>
+                            <span style="font-size:12px; font-weight:500; color:var(--bf-muted);">cumulativo com os descontos dos planos semestral e anual</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bf-tape">BLACK FRIDAY • 50% OFF • BLACK FRIDAY • 50% OFF • BLACK FRIDAY • 50% OFF • BLACK FRIDAY • 50% OFF • BLACK FRIDAY • 50% OFF</div>
+                <div class="bf-cover-bottom">
+                    <div style="display:flex; flex-direction:column; gap:14px;">
+                        <div style="font-size:12px; font-weight:700; letter-spacing:2px; color:var(--bf-yellow);">ORÇAMENTO E PROPOSTA COMERCIAL</div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <div style="font-size:24px; font-weight:800; line-height:1.1;" data-bf="cliente"></div>
+                            <div style="font-size:13px; font-weight:500; color:var(--bf-muted); text-transform:uppercase;" data-bf="contato"></div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:2px; padding-top:12px; border-top:1px solid var(--bf-line);">
+                            <div style="font-size:15px; font-weight:800;" data-bf="consultor"></div>
+                            <div style="font-size:13px; font-weight:600; color:#D8D8D2;" data-bf="cargo"></div>
+                            <div style="font-size:13px; font-weight:500; color:var(--bf-muted);" data-bf="telefone"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+                        <div class="bf-validity">
+                            <div>Validade da proposta</div>
+                            <div data-bf="validade"></div>
+                        </div>
+                        <div style="font-size:12px; font-weight:500; color:var(--bf-muted);" data-bf="hoje"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 02 Introdução -->
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="bf-band"><span>BLACK FRIDAY CONTELE TEAMS</span><span>50% OFF NOS 3 PRIMEIROS MESES · 01 A 30/11</span></div>
+                <div class="page-content bf-content">
+                    <h2 class="pdf-section-title">Olá, <span data-bf="nome"></span>!</h2>
+                    <p class="pdf-body-text">Ficamos felizes pelo seu interesse no <strong>Contele Teams</strong>, o sistema de Gestão de Equipes Externas com mais de 1.500 clientes ativos.</p>
+                    <p class="pdf-body-text">O objetivo dessa proposta é fornecer a solução tecnológica da Contele para gestão eficiente de equipes externas, com foco na <strong>otimização da roteirização, controle de reembolso de quilometragem, monitoramento em tempo real e geração de relatórios personalizados</strong>, visando atender as necessidades específicas da <strong data-bf="cliente"></strong>, promovendo aumento de produtividade, redução de custos operacionais e melhoria no acompanhamento das atividades dos vendedores e colaboradores.</p>
+                    <div class="bf-strip" style="margin:6px 0 4px;">
+                        <span class="bf-chip" style="font-size:20px; padding:4px 10px; letter-spacing:-1px;">50% OFF</span>
+                        <span style="font-size:12.5px; font-weight:600; line-height:1.4;">Contratando até 30 de novembro, você paga metade nos 3 primeiros meses. Veja os valores na seção Investimento.</span>
+                    </div>
+                    <h2 class="pdf-section-title" style="text-align:center; margin-top:26px;">Escopo da Solução</h2>
+                    <ul class="pdf-custom-list">
+                        <li>Controle e acompanhamento de visitas externas com <strong>check-in geolocalizado</strong></li>
+                        <li>Formulários <strong>customizáveis</strong> para registro de visitas</li>
+                        <li>Gestão de <strong>despesas avulsas e quilometragem</strong>, com comprovantes</li>
+                        <li>Painéis de indicadores e produtividade (dashboards integráveis ao Looker Studio)</li>
+                        <li>Aplicativo disponível para iOS e Android com <strong>funcionamento offline</strong></li>
+                        <li>Consultoria especializada para implantação e onboarding</li>
+                    </ul>
+                    <div style="text-align:center; margin-top:18px;">
+                        <img src="https://i.ibb.co/60sHBzRt/2.png" alt="Escopo da Solução" class="content-img" style="max-height:330px;">
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" class="page-footer-logo" alt="Contele Teams">
+            </div>
+
+            <!-- 03 Funcionalidades -->
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="bf-band"><span>BLACK FRIDAY CONTELE TEAMS</span><span>50% OFF NOS 3 PRIMEIROS MESES · 01 A 30/11</span></div>
+                <div class="page-content bf-content" style="padding-top:24mm; padding-bottom:30mm; gap:22px;">
+                    <div style="display:flex; gap:18px; align-items:center;">
+                        <div style="flex:1;">
+                            <h2 class="pdf-section-title">Controle de Visitas</h2>
+                            <p class="pdf-body-text">A gestão de equipes externas é aprimorada pelo uso de check-in e check-out via GPS, garantindo o registro preciso. Pelo app, a equipe preenche digitalmente os dados da visita — incluindo fotos e assinaturas — eliminando o uso de papéis.</p>
+                            <p class="pdf-body-text" style="margin-bottom:0;">Em tempo real, o gestor acompanha a localização de todos e acessa o Relatório de Visitas. Assim, é possível identificar clientes não atendidos, planejar novas rotas e otimizar tempo e recursos operacionais.</p>
+                        </div>
+                        <div style="flex:1;"><img src="https://i.ibb.co/VpNgVy2v/3.png" alt="Controle de Visitas" class="content-img" style="max-height:205px;"></div>
+                    </div>
+                    <div style="display:flex; gap:18px; align-items:center;">
+                        <div style="flex:1;"><img src="https://i.ibb.co/PzsxvWS2/4.png" alt="Monitoramento Mapa" class="content-img" style="max-height:170px;"></div>
+                        <div style="flex:1;">
+                            <h2 class="pdf-section-title">Monitoramento da Equipe Externa</h2>
+                            <p class="pdf-body-text">Com o Mapa da Equipe, o gestor consegue visualizar e monitorar toda a equipe externa em tempo real, obtendo a localização atual de cada colaborador de maneira simples e muito intuitiva.</p>
+                            <p class="pdf-body-text" style="margin-bottom:0;">Para uma análise aprofundada, o Relatório de Monitoramento oferece dados essenciais da rotina, como histórico de login e logout, uso de localização fictícia e nível de bateria, garantindo um acompanhamento preciso.</p>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:18px; align-items:center;">
+                        <div style="flex:1;">
+                            <h2 class="pdf-section-title">Checklist Digital</h2>
+                            <p class="pdf-body-text">Crie checklists personalizadas para suas visitas, com dezenas de tipos de perguntas. Defina questões obrigatórias para garantir a coleta de informações estratégicas, evitar esquecimentos e tornar as visitas mais ágeis.</p>
+                            <p class="pdf-body-text" style="margin-bottom:0;">Com o Contele Teams, você pode usar campos condicionais que guiam automaticamente o colaborador às seções relevantes no aplicativo. Depois, basta analisar todas as respostas no painel de forma global ou individual.</p>
+                        </div>
+                        <div style="flex:1;"><img src="https://i.ibb.co/C575tDjL/5.png" alt="Checklist App" class="content-img" style="max-height:180px;"></div>
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" class="page-footer-logo" alt="Contele Teams">
+            </div>
+
+            <!-- 04 Ordem de Serviço -->
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="bf-band"><span>BLACK FRIDAY CONTELE TEAMS</span><span>50% OFF NOS 3 PRIMEIROS MESES · 01 A 30/11</span></div>
+                <div class="page-content bf-content">
+                    <h2 class="pdf-section-title">Ordem de Serviço Digital</h2>
+                    <p class="pdf-body-text">A Ordem de Serviço Digital oferece todos os detalhes da visita para você e seu cliente, incluindo logo personalizado, horários de check-in e check-out, fotos, comentários, checklists, assinatura digital e envio automático por e-mail.</p>
+                    <div style="margin:18px 0;"><img src="https://i.ibb.co/v4dWtZDF/6.png" alt="Ordem de Serviço" class="content-img" style="max-height:240px;"></div>
+                    <p class="pdf-body-text">Após a visita, a OS pode ser enviada pelo funcionário via e-mail ou WhatsApp, ou você pode enviá-la pelo computador, verificando e editando as informações conforme necessário. Além disso, você pode configurar preferências, como envio automático e exibição de formulários e comentários, adaptando a OS às suas necessidades.</p>
+                    <h2 class="pdf-section-title" style="margin-top:36px;">Relatório de Visitas</h2>
+                    <p class="pdf-body-text">O gestor acompanha em tempo real a localização e produtividade das equipes, editando e exportando relatórios detalhados de visitas, com filtros personalizáveis, exportação para Excel e PDF, e fácil restauração de visitas canceladas, garantindo total controle e agilidade no gerenciamento.</p>
+                    <div style="margin:18px 0;"><img src="https://i.ibb.co/xbhSxbG/7.png" alt="Relatório de Visitas" class="content-img" style="max-height:240px;"></div>
+                </div>
+                <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" class="page-footer-logo" alt="Contele Teams">
+            </div>
+
+            <!-- 05 Reembolso -->
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="bf-band"><span>BLACK FRIDAY CONTELE TEAMS</span><span>50% OFF NOS 3 PRIMEIROS MESES · 01 A 30/11</span></div>
+                <div class="page-content bf-content">
+                    <h2 class="pdf-section-title">Reembolso de KM Rodado e Avulso</h2>
+                    <p class="pdf-body-text">Por padrão, o Contele Teams utiliza o endereço do primeiro check-in do dia como ponto de partida e o último check-in como ponto de chegada. Isso significa que o reembolso de KM rodado será contabilizado entre esses dois pontos.</p>
+                    <p class="pdf-body-text">Durante o período entre o primeiro e o último check-in, o sistema calcula as rotas mais eficientes para o usuário. Isso pode resultar em alterações caso o gestor tenha planejado a rota previamente e ocorra congestionamento ou desvio inesperado durante o dia.</p>
+                    <div style="margin:18px auto; width:80%;"><img src="https://i.ibb.co/Ndhsc26q/8.png" alt="Rota no Mapa" class="content-img" style="max-height:250px;"></div>
+                    <p class="pdf-body-text">Além do reembolso por KM rodado, feito automaticamente pelo app Contele Equipes, o usuário pode realizar lançamentos manuais de gastos reembolsáveis e não reembolsáveis, através dos reembolsos avulsos.</p>
+                    <div style="display:flex; gap:35px; margin-top:18px; align-items:center;">
+                        <div style="flex:1;"><img src="https://i.ibb.co/s9bGmgs1/oie-transparent-47.png" alt="Reembolso App" class="content-img" style="max-height:310px;"></div>
+                        <div style="flex:1;">
+                            <p class="pdf-body-text" style="font-size:15px; font-weight:600;">No aplicativo, o usuário pode lançar reembolsos de:</p>
+                            <ul class="pdf-custom-list" style="list-style:none; padding:0;">
+                                <li><span style="color:var(--pdf-blue);">●</span> Transporte</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Estacionamento</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Pedágio</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Alimentação</li>
+                                <li><span style="color:var(--pdf-blue);">●</span> Hospedagem</li>
+                                <li>Entre outros</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" class="page-footer-logo" alt="Contele Teams">
+            </div>
+
+            <!-- 06 Dashboard -->
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="bf-band"><span>BLACK FRIDAY CONTELE TEAMS</span><span>50% OFF NOS 3 PRIMEIROS MESES · 01 A 30/11</span></div>
+                <div class="page-content bf-content">
+                    <h2 class="pdf-section-title">Dashboard Personalizado</h2>
+                    <p class="pdf-body-text">Estamos <strong>100% integrados ao Looker Studio</strong>, a ferramenta de BI do Google!</p>
+                    <p class="pdf-body-text">Conecte os dados do Contele Teams ao Looker, e crie dashboards de acordo com a necessidade da sua operação.</p>
+                    <p class="pdf-body-text">Economize horas e aumente em até <strong>22% sua lucratividade</strong> com decisões baseadas em dados.</p>
+                    <div style="margin:25px 0;"><img src="https://i.ibb.co/nsSKvv9Q/10.png" alt="Dashboard Looker Studio" class="content-img" style="max-height:600px;"></div>
+                </div>
+                <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" class="page-footer-logo" alt="Contele Teams">
+            </div>
+
+            <!-- 07 ROI + Planos -->
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="bf-band"><span>BLACK FRIDAY CONTELE TEAMS</span><span>50% OFF NOS 3 PRIMEIROS MESES · 01 A 30/11</span></div>
+                <div class="page-content bf-content">
+                    <h2 class="pdf-table-title" style="margin-top:20px;">ROI (Retorno sobre Investimento)</h2>
+                    <table class="pdf-table-roi">
+                        <thead>
+                            <tr><th>Funcionalidade</th><th>Economia Estimada</th><th>Justificativa</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td contenteditable="true">Reembolso de despesas</td><td contenteditable="true">20% de economia</td><td contenteditable="true">Redução de erros e aumento na transparência</td></tr>
+                            <tr><td contenteditable="true">Controle de Visitas</td><td contenteditable="true">15% de aumento na produtividade</td><td contenteditable="true">Aumento de eficiência com roteirização inteligente</td></tr>
+                            <tr><td contenteditable="true">Horas Improdutivas</td><td contenteditable="true">30% de redução</td><td contenteditable="true">Eliminação de processos manuais e otimização de tempo</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="font-size:11px; font-style:italic; text-align:center; color:#555; margin-bottom:28px;">Esses percentuais são estimativas baseadas em estudos anteriores.<br>A economia real pode variar conforme o cenário específico da sua empresa.</p>
+                    <h2 class="pdf-table-title" style="margin-top:20px;">Planos</h2>
+                    <table class="pdf-table-planos">
+                        <tr>
+                            <td>Pré-pago</td>
+                            <td contenteditable="true">Não há contrato de fidelidade nem multas de cancelamento.</td>
+                        </tr>
+                    </table>
+                    <div class="guarantee-box" style="margin-top:40px;">
+                        <div class="guarantee-icon">
+                            <span style="display:block;">Garantia Risco Zero</span>
+                            <span style="font-size:11.5px; font-weight:normal;">Contrate sem medo</span>
+                        </div>
+                        <div class="guarantee-text">Se em 30 dias você não ficar satisfeito, pode cancelar o contrato sem custo e sem burocracias.</div>
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" class="page-footer-logo" alt="Contele Teams">
+            </div>
+
+            <!-- 08 Investimento Black Friday -->
+            <div class="a4-page bf-dark">
+                <div class="bf-stripes" style="top:0; left:0; right:0; height:46mm;"></div>
+                <div style="position:relative; z-index:2; padding:18mm; height:100%; display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-size:12px; font-weight:800; letter-spacing:3px; color:var(--bf-yellow);">OFERTA BLACK FRIDAY</div>
+                        <div style="font-size:11px; font-weight:700; letter-spacing:2px; color:var(--bf-muted);">VÁLIDA DE 01 A 30/11</div>
+                    </div>
+                    <div style="font-size:46px; font-weight:900; letter-spacing:-2px; line-height:1; margin-top:10mm;">Investimento</div>
+                    <div class="bf-summary">
+                        <div>
+                            <span class="bf-label">USUÁRIOS</span>
+                            <span class="bf-value" id="bf-out-qtd"></span>
+                        </div>
+                        <div>
+                            <span class="bf-label">VALOR POR USUÁRIO</span>
+                            <span class="bf-value" id="bf-out-preco"></span>
+                        </div>
+                        <div class="bf-yellow-box">
+                            <span class="bf-label">NOS 3 PRIMEIROS MESES</span>
+                            <span class="bf-value"><span id="bf-out-preco-bf"></span><span style="font-size:13px; font-weight:700; letter-spacing:0;"> /usuário</span></span>
+                        </div>
+                    </div>
+                    <table class="bf-table">
+                        <thead>
+                            <tr><th>PLANO</th><th>DE</th><th class="bf-th-hl">POR (BLACK FRIDAY)</th><th>ECONOMIA</th></tr>
+                        </thead>
+                        <tbody id="bf-linhas"></tbody>
+                    </table>
+                    <div style="font-size:11px; line-height:1.5; color:var(--bf-muted); margin-top:12px;">Desconto de 50% aplicado nos 3 primeiros meses, cumulativo com os descontos dos planos Semestral (10%) e Anual (15%). Válido para contratações realizadas de 01 a 30 de novembro. Após o período promocional, os valores retornam ao preço regular do plano.</div>
+                    <div class="bf-guarantee">
+                        <div>
+                            <span style="font-size:14px; font-weight:800;">Garantia Risco Zero</span>
+                            <span style="font-size:11px; font-weight:500;">Contrate sem medo</span>
+                        </div>
+                        <div>Se em 30 dias você não ficar satisfeito, pode cancelar o contrato sem custo e sem burocracias.</div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10mm;">
+                        <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" alt="Contele Teams" style="height:24px; display:block;">
+                        <div style="font-size:11px; font-weight:600; color:var(--bf-muted);"><span data-bf="consultor"></span> · <span data-bf="telefone"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 09 Clientes + Próximos passos -->
+            <div class="a4-page">
+                <img src="https://i.ibb.co/vvxcMsHM/fundo.jpg" class="page-bg" alt="Fundo">
+                <div class="bf-band"><span>BLACK FRIDAY CONTELE TEAMS</span><span>50% OFF NOS 3 PRIMEIROS MESES · 01 A 30/11</span></div>
+                <div class="page-content bf-content">
+                    <h2 class="pdf-section-title" style="text-align:center; margin-top:20px;">As melhores equipes do Brasil utilizam o Contele Teams</h2>
+                    <div style="margin:18px 0;"><img src="https://i.ibb.co/HTxnfwB0/11.png" alt="Logos dos Clientes" style="width:100%; max-height:300px; object-fit:contain; display:block;"></div>
+                    <h2 class="pdf-section-title" style="text-align:center; margin:18px 0 0;">Próximos passos</h2>
+                    <div style="margin:14px -20mm 0;"><img src="https://i.ibb.co/CsbYbNbY/12.png" alt="Roadmap de Contratação" style="width:100%; max-height:400px; object-fit:contain; display:block;"></div>
+                    <div class="bf-strip" style="margin-top:auto; margin-bottom:14mm; align-self:center; gap:12px; padding:10px 16px;">
+                        <span class="bf-chip" style="font-size:14px; padding:3px 8px;">50% OFF</span>
+                        <span style="font-size:12px; font-weight:700;">Condição Black Friday para contratações até 30 de novembro</span>
+                    </div>
+                </div>
+                <img src="https://i.ibb.co/BHjm6dp2/logo-teams-espelhado.png" class="page-footer-logo" alt="Contele Teams">
+            </div>
+
+        </div>
+    </div>
+
     <script>
         // Função de navegação das abas do portal
         function showPage(pageId, btnElement) {
@@ -818,6 +1189,59 @@
             }
         }
 
+        // ==========================================
+        // LÓGICA DA PROPOSTA BLACK FRIDAY
+        // 50% nos 3 primeiros meses, cumulativo com
+        // 10% (semestral) e 15% (anual)
+        // ==========================================
+        function atualizarBF() {
+            const val = id => document.getElementById('bf-' + id).value;
+            const preencher = (chave, texto) => document.querySelectorAll('[data-bf="' + chave + '"]').forEach(el => el.innerText = texto);
+
+            ['cliente', 'contato', 'consultor', 'cargo', 'telefone', 'validade'].forEach(c => preencher(c, val(c)));
+            preencher('nome', val('contato').replace(/^A\/C:?\s*/i, '').trim().split(/\s+/)[0] || '');
+            preencher('hoje', new Date().toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+
+            const qtd = parseInt(val('qtd'), 10) || 0;
+            const combo = document.getElementById('bf-combo').checked;
+            const precoAuto = (combo || qtd >= 41) ? 52.00 : 62.50;
+            const inputPreco = document.getElementById('bf-preco');
+            inputPreco.placeholder = 'Auto: ' + precoAuto.toFixed(2).replace('.', ',');
+            const manual = parseFloat(String(inputPreco.value).replace(',', '.'));
+            const preco = isNaN(manual) ? precoAuto : manual;
+
+            const mensal = qtd * preco;
+            const BF = 0.5;
+
+            document.getElementById('bf-out-qtd').innerText = qtd;
+            document.getElementById('bf-out-preco').innerText = formatarMoeda(preco);
+            document.getElementById('bf-out-preco-bf').innerText = formatarMoeda(preco * BF);
+
+            const ciclo = (meses, desc) => {
+                const f = 1 - desc;
+                const cheio = mensal * meses * f;
+                const promo = Math.min(3, meses);
+                const por = (mensal * promo * BF + mensal * (meses - promo)) * f;
+                return { cheio, por, eco: cheio - por };
+            };
+
+            const tri = ciclo(3, 0), sem = ciclo(6, 0.10), anu = ciclo(12, 0.15);
+            const linhas = [
+                { plano: 'Mensal', pagto: 'Cartão de crédito ou boleto', de: formatarMoeda(mensal) + '/mês', por: formatarMoeda(mensal * BF) + '/mês', ciclo: 'do 1º ao 3º mês', eco: formatarMoeda(mensal * 3 * BF), depois: 'A partir do 4º mês: ' + formatarMoeda(mensal) + '/mês' },
+                { plano: 'Trimestral', pagto: 'Boleto trimestral', de: formatarMoeda(tri.cheio), por: formatarMoeda(tri.por), ciclo: '1º trimestre', eco: formatarMoeda(tri.eco), depois: 'Ciclos seguintes: ' + formatarMoeda(tri.cheio) },
+                { plano: 'Semestral', pagto: 'Boleto semestral · 10% de desconto', de: formatarMoeda(sem.cheio), por: formatarMoeda(sem.por), ciclo: '1º semestre', eco: formatarMoeda(sem.eco), depois: 'Ciclos seguintes: ' + formatarMoeda(sem.cheio) },
+                { plano: 'Anual', pagto: 'Boleto anual · 15% de desconto', de: formatarMoeda(anu.cheio), por: formatarMoeda(anu.por), ciclo: '1º ano', eco: formatarMoeda(anu.eco), depois: 'Ciclos seguintes: ' + formatarMoeda(anu.cheio) }
+            ];
+
+            document.getElementById('bf-linhas').innerHTML = linhas.map(l => `
+                <tr>
+                    <td><div class="bf-plano">${l.plano}</div><div class="bf-sub">${l.pagto}</div></td>
+                    <td><div class="bf-de">${l.de}</div></td>
+                    <td><div class="bf-por">${l.por}</div><div class="bf-sub" style="color:#D8D8D2; font-weight:600;">${l.ciclo}</div></td>
+                    <td><div class="bf-eco">${l.eco}</div><div class="bf-sub">${l.depois}</div></td>
+                </tr>`).join('');
+        }
+
         // Inicialização Global
         document.addEventListener('DOMContentLoaded', () => {
             // Inicializa a aba da calculadora
@@ -834,6 +1258,9 @@
 
             // Garante que o PDF receba os cálculos atualizados em tempo de carregamento
             calcularValoresPDF();
+
+            // Inicializa a proposta Black Friday
+            atualizarBF();
         });
     </script>
 </body>
